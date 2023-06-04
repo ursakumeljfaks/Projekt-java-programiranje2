@@ -18,7 +18,15 @@ public class BubbleShooter extends JFrame {
             bubbleShooter.setVisible(true);
       
     }
-
+    
+    static int BUBBLE_SIZE = 35;//Math.min(getWidth() / 8, getHeight() / 8);
+    
+    static int BOARD_ROWS = 24;
+    
+    static int BOARD_COLUMNS = 12;
+    
+    GameBoard gameBoard = new GameBoard();
+    
     public BubbleShooter() {
         super();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -32,20 +40,23 @@ public class BubbleShooter extends JFrame {
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
 
-                int bubbleSize = 35;//Math.min(getWidth() / 8, getHeight() / 8);
-                GameBoard gameBoard = new GameBoard();
-
-                for (int row = 0; row < 8; row++) {
-                    for (int col = 0; col < 13; col++) {
-                        Bubble bubble = gameBoard.getBubbles()[row][col];
-                        if (row % 2 == 1 && (col == 0 || col == 12)) {
-                            continue;
+                
+                Bubble[][] bubbles = gameBoard.getBubbles();
+                
+                for (int row = 0; row < bubbles.length; row++) {
+                    for (int col = 0; col < bubbles[row].length; col++) {
+                        Bubble bubble = bubbles[row][col];
+                        if (bubble.isEmpty()) {
+                        	continue;
                         }
-                        int x = col * bubbleSize;
-                        int y = row * bubbleSize;
+                        int x = col * BUBBLE_SIZE;
+                        int y = row * BUBBLE_SIZE;
+                        if (row % 2 == 1) {
+                        	x = x + (int)(0.5* BUBBLE_SIZE);
+                        }
 
                         g.setColor(bubble.getColor());
-                        g.fillOval(x, y, bubbleSize, bubbleSize);
+                        g.fillOval(x, y, BUBBLE_SIZE, BUBBLE_SIZE);
                     }
                 }
             }
@@ -55,27 +66,31 @@ public class BubbleShooter extends JFrame {
 
         JPanel console = new JPanel();
         add(console, BorderLayout.NORTH);
+        
     }
 
 
     
-    String[] bubbleColors = { "red", "blue", "green", "yellow", "purple" };
+    static Color[] bubbleColors = { Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PINK};
 
     class GameBoard {
         private Bubble[][] bubbles;
 
         public GameBoard() {
 
-            bubbles = new Bubble[8][13];
+            bubbles = new Bubble[BOARD_ROWS][BOARD_COLUMNS];
             Random random = new Random();
 
-            for (int row = 0; row < 8; row++) {
-                for (int col = 0; col < 13; col++) {
-                    Color randomColor = new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256));
-                    if (row % 2 == 1 && (col == 0 || col == 12)) {
-                        continue;
-                    }
+            for (int row = 0; row < bubbles.length/3; row++) {
+                for (int col = 0; col < bubbles[row].length; col++) {
+                    Color randomColor = bubbleColors[random.nextInt(bubbleColors.length)];                    
                     Bubble bubble = new Bubble(row, col, randomColor);
+                    bubbles[row][col] = bubble;
+                }
+            }
+            for (int row = bubbles.length/3; row < bubbles.length; row++) {
+                for (int col = 0; col < bubbles[row].length; col++) {
+                	Bubble bubble = new Bubble(row, col, true);
                     bubbles[row][col] = bubble;
                 }
             }
@@ -90,11 +105,17 @@ public class BubbleShooter extends JFrame {
         private int row;
         private int col;
         private Color color;
+        private boolean empty;
 
         public Bubble(int row, int col, Color color) {
             this.row = row;
             this.col = col;
             this.color = color;
+        }
+        
+        public Bubble(int row, int col, boolean empty) {
+        	this(row, col, Color.WHITE);
+        	this.empty = empty;        	
         }
 
         public int getRow() {
@@ -108,6 +129,13 @@ public class BubbleShooter extends JFrame {
         public Color getColor() {
             return color;
         }
+        
+        public boolean isEmpty() {
+            return empty;
+        }
+        
+        public void setEmpty(boolean vr) {
+            empty = vr;
+        }
     }
 } 
-
