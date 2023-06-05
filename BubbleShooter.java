@@ -18,7 +18,7 @@ public class BubbleShooter extends JFrame {
     public static void main(String[] args) {
     	
             BubbleShooter bubbleShooter = new BubbleShooter();
-            bubbleShooter.setVisible(true);
+            //bubbleShooter.setVisible(true);
       
     }
     
@@ -43,7 +43,7 @@ public class BubbleShooter extends JFrame {
         super();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getRootPane().putClientProperty("apple.awt.brushMetalLook", true);
-        setSize(new Dimension(438, 600));
+        setSize(new Dimension(455, 900));
         setResizable(false);
         setLayout(new BorderLayout());
 
@@ -76,9 +76,12 @@ public class BubbleShooter extends JFrame {
                 }
                 if (ball != null) {
                 	g.setColor(ballColor);
-                    int x = (int) ball.getX();
-                    int y = (int) ball.getY();
+                    int x = (int) (ball.getX());
+                    int y = (int) (ball.getY());
                     g.fillOval(x, y, BUBBLE_SIZE, BUBBLE_SIZE);
+                }
+                else {
+                	g.fillOval(202, 820 , BUBBLE_SIZE, BUBBLE_SIZE);
                 }
 
             }
@@ -89,9 +92,9 @@ public class BubbleShooter extends JFrame {
                 if (ball == null) {
                     int klikX = e.getX();
                     int klikY = e.getY();
-                    ball = new Point(panel.getWidth() / 2, panel.getHeight() - BUBBLE_SIZE);
-                    double angle = Math.atan2(klikY - ball.getY(), klikX - ball.getX());
-                    double speed = 15;
+                    ball = new Point(202, 820);
+                    double angle = Math.atan2(klikY - (ball.getY()+0.5*BUBBLE_SIZE), klikX - (ball.getX()+0.5*BUBBLE_SIZE));
+                    double speed = 5;
                     direction = new Point((int) (speed * Math.cos(angle)), (int) (speed * Math.sin(angle)));
                 }
             }
@@ -99,54 +102,100 @@ public class BubbleShooter extends JFrame {
  
         JFrame frame = new JFrame("Bubble Shooter");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(438, 600);
+        frame.setSize(455, 900);
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
         frame.add(panel, BorderLayout.CENTER);
         frame.setVisible(true);
         
-        direction = new Point(15, 6);
+        //direction = new Point(15, 6); //nevem zakaj to rabva
        
         Random random = new Random();
-        ballColor = bubbleColors[random.nextInt(bubbleColors.length)];
         
         while (true) {
+        	ballColor = bubbleColors[random.nextInt(bubbleColors.length)];
         	if (ball != null) {
-                ball.setLocation(ball.getX() + direction.getX(), ball.getY() + direction.getY());
-                
-                Bubble[][] bubbles = gameBoard.getBubbles();
-                int ballRow = (int) (ball.getY() / BUBBLE_SIZE);
-                int ballCol = (int) (ball.getX() / BUBBLE_SIZE);
-                Bubble bubble = bubbles[ballRow][ballCol];
-                
-                if (bubble != null && !bubble.isEmpty() && bubble.getColor().equals(ballColor) ) {
-                	bubble.setColor(Color.WHITE);
-                    bubble.setEmpty(true);
-                    break;
-                }
-                
-                if (ball.getX() <= 32) {
-                    ball.setLocation(32, ball.getY());
-                    direction.setLocation(-direction.getX(), direction.getY());
-                } else if (ball.getX() >= panel.getWidth() - 32) {
-                    ball.setLocation(panel.getWidth() - 32, ball.getY());
-                    direction.setLocation(-direction.getX(), direction.getY());
-                }
-                if (ball.getY() <= 32) {
-                    ball.setLocation(ball.getX(), 32);
-                    direction.setLocation(direction.getX(), -direction.getY());
-                } else if (ball.getY() >= panel.getHeight() - 32) {
-                    ball.setLocation(ball.getX(), panel.getHeight() - 32);
-                    direction.setLocation(direction.getX(), -direction.getY());
-                }
-                panel.repaint();
-            }
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        		
+        		while (true) {
+
+        			Bubble[][] bubbles = gameBoard.getBubbles();
+        			ball.setLocation(ball.getX() + direction.getX(), ball.getY() + direction.getY());
+        			if (dotakne(bubbles, ball)) {                	
+        				int row = (int) (ball.getY() / BUBBLE_SIZE);
+        				if ((ball.getY()/BUBBLE_SIZE)%1 > 0.5) {
+        					row += 1;
+        				}
+
+        				int col = (int) (ball.getX() / BUBBLE_SIZE);
+        				if (row % 2 == 1) {
+        					if (Math.abs((col+0.5)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1.5)*BUBBLE_SIZE - ball.getX()))){
+        						col += 1;
+        					}
+        				}
+        				if (row % 2 == 0) {
+        					if (Math.abs((col)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1)*BUBBLE_SIZE - ball.getX()))){
+        						col += 1;
+        					}
+        				}
+
+        				Bubble novi = bubbles[row][col];
+        				novi.setEmpty(false);
+        				novi.setColor(ballColor);
+        				novi.setRow(row);
+        				novi.setCol(col);
+
+
+        				//rekurzivno pregleda koliko istih je skupaj in primerne zbriše
+
+
+        				ball = null;
+        				panel.repaint();
+        				
+        				break;
+        			}
+
+        			
+
+        			if (ball.getX() <= 0) {
+        				ball.setLocation(0, ball.getY());
+        				direction.setLocation(-direction.getX(), direction.getY());
+        			} else if (ball.getX() >= panel.getWidth() - 35) {
+        				ball.setLocation(panel.getWidth() - 35, ball.getY());
+        				direction.setLocation(-direction.getX(), direction.getY());
+        			}
+        			if (ball.getY() <= 32) {
+        				ball.setLocation(ball.getX(), 32);
+        				direction.setLocation(direction.getX(), -direction.getY());
+        			} else if (ball.getY() >= panel.getHeight() - 32) {
+        				ball.setLocation(ball.getX(), panel.getHeight() - 32);
+        				direction.setLocation(direction.getX(), -direction.getY());
+        			}
+        			panel.repaint();
+
+        			try {
+        				Thread.sleep(10);
+        			} catch (InterruptedException e) {
+        				e.printStackTrace();
+        			}
+        		}
+        		
+        	}
         }
+    }
+    public boolean dotakne(Bubble[][] bubbles, Point ball) {
+    	for (int i = 0; i < bubbles.length; i++) {
+			for (int j = 0; j < bubbles[i].length; j++) {
+				Bubble bubble = bubbles[i][j];
+				if (bubble.isEmpty()) {
+					continue;
+				}
+				double distance = Math.sqrt(Math.pow(bubble.getX() - ball.getX(),2) + Math.pow(bubble.getY() - ball.getY(),2));
+				if (distance < BUBBLE_SIZE) {
+					return true;
+				}
+			}
+    	}
+    	return false;
     }
 
 
@@ -184,11 +233,17 @@ public class BubbleShooter extends JFrame {
         private int col;
         private Color color;
         private boolean empty;
+        private int x;
+        private int y;
 
         public Bubble(int row, int col, Color color) {
             this.row = row;
             this.col = col;
             this.color = color;
+            x = col * BUBBLE_SIZE;
+            y = row * BUBBLE_SIZE;
+            if (row % 2 == 1) 	
+            	x = x + (int)(0.5* BUBBLE_SIZE);
         }
         
         public Bubble(int row, int col, boolean empty) {
@@ -209,7 +264,12 @@ public class BubbleShooter extends JFrame {
         public void setCol(int col) {
         	this.col = col ;
         }
-
+        public int getX() {
+        	return x;
+        }
+        public int getY() {
+        	return y;
+        }
         public Color getColor() {
             return color;
         }
