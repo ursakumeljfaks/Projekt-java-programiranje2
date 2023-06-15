@@ -22,19 +22,20 @@ public class BubbleShooter extends JFrame {
             //bubbleShooter.setVisible(true);
       
     }
-    
-    static int BUBBLE_SIZE = 35;
-    
+    static int PANEL_HEIGHT = 610;
+    static int PANEL_WIDTH = 305;
+    static int BUBBLE_SIZE = 23;
     static int BOARD_ROWS = 24;
-    
     static int BOARD_COLUMNS = 12;
-    
     static Color[] bubbleColors = { new Color(80, 171, 199), new Color(245, 66, 102),
     		new Color(91, 176, 72), new Color(230, 230, 76), new Color(165, 22, 222)};
     
     GameBoard gameBoard = new GameBoard();
     
-    private Point ball = new Point(202, 820);
+    static int START_X = PANEL_WIDTH/2 - BUBBLE_SIZE/2;
+    static int START_Y = PANEL_HEIGHT - 50 - BUBBLE_SIZE;
+    
+    private Point ball = new Point(START_X, START_Y);
     
     private Point direction;
     
@@ -48,7 +49,7 @@ public class BubbleShooter extends JFrame {
         super();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getRootPane().putClientProperty("apple.awt.brushMetalLook", true);
-        setSize(new Dimension(455, 900));
+        setSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         setResizable(false);
         setLayout(new BorderLayout());
 
@@ -89,19 +90,26 @@ public class BubbleShooter extends JFrame {
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (ball.getX()==202 && ball.getY() == 820) {
-                    double klikX = e.getX();
-                    double klikY = e.getY();
-                    double angle = Math.atan2(klikY - (ball.getY()+0.5*BUBBLE_SIZE), klikX - (ball.getX()+0.5*BUBBLE_SIZE));
-                    double speed = 5;
-                    direction = new Point((int) Math.round(speed * Math.cos(angle)), (int) Math.round(speed * Math.sin(angle)));
+                if (ball.getX()==START_X && ball.getY() == START_Y) {
+                    double dx = e.getX() - ball.getX();
+                    double dy = e.getY() - ball.getY();
+                    double distance = Math.sqrt(dx * dx + dy * dy);
+                    double speed = 10;
+                    double directionX = speed * dx / distance;
+                    double directionY = speed * dy / distance;
+                    direction = new Point((int)Math.round(directionX), (int)Math.round(directionY));
+                    //double klikX = e.getX();
+                    //double klikY = e.getY();
+                    //double angle = Math.atan2(klikY - (ball.getY()+0.5*BUBBLE_SIZE), klikX - (ball.getX()+0.5*BUBBLE_SIZE));
+                    //double speed = 5;
+                    //direction = new Point((int) Math.round(speed * Math.cos(angle)), (int) Math.round(speed * Math.sin(angle)));
                 }
             }
         });
  
         JFrame frame = new JFrame("Bubble Shooter");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(455, 900);
+        frame.setSize(PANEL_WIDTH, PANEL_HEIGHT);
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
         frame.add(panel, BorderLayout.CENTER);
@@ -155,7 +163,7 @@ public class BubbleShooter extends JFrame {
         				}
 
         				direction = null;
-        				ball.setLocation(202, 820);
+        				ball.setLocation(START_X, START_Y);
         				ballColor = bubbleColors[random.nextInt(bubbleColors.length)];
         				panel.repaint();
         				
@@ -167,21 +175,21 @@ public class BubbleShooter extends JFrame {
         			if (ball.getX() <= 0) {
         				ball.setLocation(0, ball.getY());
         				direction.setLocation(-direction.getX(), direction.getY());
-        			} else if (ball.getX() >= panel.getWidth() - 35) {
-        				ball.setLocation(panel.getWidth() - 35, ball.getY());
+        			} else if (ball.getX() >= panel.getWidth() - 23) {
+        				ball.setLocation(panel.getWidth() - 23, ball.getY());
         				direction.setLocation(-direction.getX(), direction.getY());
         			}
-        			if (ball.getY() <= 32) {
-        				ball.setLocation(ball.getX(), 32);
+        			if (ball.getY() <= 23) {
+        				ball.setLocation(ball.getX(), 23);
         				direction.setLocation(direction.getX(), -direction.getY());
-        			} else if (ball.getY() >= panel.getHeight() - 32) {
-        				ball.setLocation(ball.getX(), panel.getHeight() - 32);
+        			} else if (ball.getY() >= panel.getHeight() - 23) {
+        				ball.setLocation(ball.getX(), panel.getHeight() - 23);
         				direction.setLocation(direction.getX(), -direction.getY());
         			}
         			panel.repaint();
 
         			try {
-        				Thread.sleep(10);
+        				Thread.sleep(15);
         			} catch (InterruptedException e) {
         				e.printStackTrace();
         			}
