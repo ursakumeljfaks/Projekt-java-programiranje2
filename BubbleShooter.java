@@ -6,7 +6,8 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Random;
-
+import java.util.Set;
+import java.util.HashSet;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -145,8 +146,14 @@ public class BubbleShooter extends JFrame {
         				novi.setCol(col);
 
 
-        				//rekurzivno pregleda koliko istih je skupaj in primerne zbriše
-
+        				Set<Bubble> isti_sosedi = new HashSet<Bubble>();
+        				isti_sosedi.add(novi);
+        				isti_sosedi.addAll(izbrise(bubbles, novi, isti_sosedi));
+        				if (isti_sosedi.size() >= 3) {
+        					for (Bubble sosed:isti_sosedi) {
+        						sosed.setEmpty();
+        					}
+        				}
 
         				ball = null;
         				panel.repaint();
@@ -197,7 +204,54 @@ public class BubbleShooter extends JFrame {
     	}
     	return false;
     }
-
+    public Set<Bubble> izbrise(Bubble[][] bubbles, Bubble ball, Set<Bubble> set){
+    	Set<Bubble> sosedi = new HashSet<Bubble>();
+    	if (ball.getCol()+1 < BOARD_COLUMNS) {
+    		sosedi.add(bubbles[ball.getRow()][ball.getCol()+1]);
+    	}
+    	if (ball.getCol()-1 > 0) {
+    		sosedi.add(bubbles[ball.getRow()][ball.getCol()-1]);
+    	}
+    	
+    	if (ball.getRow()%2 == 1) {
+    		if (ball.getRow()+1 < BOARD_ROWS) {
+        		sosedi.add(bubbles[ball.getRow()+1][ball.getCol()]);
+        		if (ball.getCol()+1 < BOARD_COLUMNS) {
+            		sosedi.add(bubbles[ball.getRow()+1][ball.getCol()+1]);
+        		}
+    		}
+    		if (ball.getRow()-1 > 0) {
+        		sosedi.add(bubbles[ball.getRow()-1][ball.getCol()]);
+        		if (ball.getCol()+1 < BOARD_COLUMNS) {
+            		sosedi.add(bubbles[ball.getRow()-1][ball.getCol()+1]);
+        		}
+    		}
+    	}
+    	if (ball.getRow()%2 == 0) {
+    		if (ball.getRow()+1 < BOARD_ROWS) {
+        		sosedi.add(bubbles[ball.getRow()-1][ball.getCol()]);
+        		if (ball.getCol()-1 > 0) {
+            		sosedi.add(bubbles[ball.getRow()+1][ball.getCol()-1]);
+        		}
+    		}
+    		if (ball.getRow()-1 > 0) {
+        		sosedi.add(bubbles[ball.getRow()-1][ball.getCol()]);
+        		if (ball.getCol()-1 > 0) {
+            		sosedi.add(bubbles[ball.getRow()-1][ball.getCol()-1]);
+        		}
+    		}
+    	}
+    	
+    	
+    	for (Bubble sosed:sosedi) {
+    		if (sosed.getColor() == ball.getColor() && !set.contains(sosed)) {
+        		set.add(sosed);
+        		set.addAll(izbrise(bubbles, sosed, set));
+        	}
+    	}
+    	
+		return set;
+    }
 
  class GameBoard {
         private Bubble[][] bubbles;
@@ -281,8 +335,12 @@ public class BubbleShooter extends JFrame {
             return empty;
         }
         
+        public void setEmpty() {
+            empty = true;
+            color = Color.WHITE;
+        }
         public void setEmpty(boolean vr) {
-            empty = vr;
+        	empty = vr;
         }
     }
 } 
