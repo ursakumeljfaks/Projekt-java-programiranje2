@@ -183,7 +183,20 @@ public class BubbleShooter extends JFrame {
         						sosed.setEmpty();
         					}
         					score += isti_sosedi.size() * 10;
-        				}
+        				
+        				
+                		for (int i = 0; i < bubbles.length; i++) {
+                            for (int j = 0; j < bubbles[j].length; j++) {
+                                Bubble bubble = bubbles[i][j];
+                                if (!bubble.isEmpty()) {
+                                	Set<Bubble> pregledani = new HashSet<Bubble>();
+                                	for (Bubble ball: lebdi(bubbles, bubble, pregledani)) {
+                                		ball.setEmpty();
+                                	}
+                                }
+                            }
+        				}}
+        				
          				if (ball.getY() >= START_Y - BUBBLE_SIZE){
         						konec = true;
         						panel.repaint();
@@ -244,11 +257,49 @@ public class BubbleShooter extends JFrame {
     	return false;
     }
     public Set<Bubble> izbrise(Bubble[][] bubbles, Bubble ball, Set<Bubble> set){
+    	Set<Bubble> sosedi = vsi_sosedi(bubbles,ball);
+    	for (Bubble sosed:sosedi) {
+    		if (sosed.getColor() == ball.getColor() && !set.contains(sosed)) {
+        		set.add(sosed);
+        		set.addAll(izbrise(bubbles, sosed, set));
+        	}
+    	}
+    	
+		return set;
+    }
+    public Set<Bubble> lebdi(Bubble[][] bubbles, Bubble ball, Set<Bubble> pregledani) {
+    	pregledani.add(ball);        
+        Set<Bubble> vsi = new HashSet<>();
+        vsi.add(ball);
+                
+        if (ball.getRow() == 0) {
+            vsi.clear();
+        	return vsi;
+        }
+        
+        Set<Bubble> sosedi = vsi_sosedi(bubbles, ball);
+        for (Bubble sosed : sosedi) {
+            if (pregledani.contains(sosed)) {
+                continue;
+            }
+            Set<Bubble> novi = lebdi(bubbles, sosed, pregledani);
+            if (novi.isEmpty()) {
+                vsi.clear();
+            	return vsi;
+            } else {
+                pregledani.addAll(novi);
+                vsi.addAll(novi);
+            }
+        }
+        
+        return vsi;
+    }
+    public Set<Bubble> vsi_sosedi(Bubble[][] bubbles, Bubble ball){
     	Set<Bubble> sosedi = new HashSet<Bubble>();
     	if (ball.getCol()+1 < BOARD_COLUMNS) {
     		sosedi.add(bubbles[ball.getRow()][ball.getCol()+1]);
     	}
-    	if (ball.getCol()-1 > 0) {
+    	if (ball.getCol()-1 >= 0) {
     		sosedi.add(bubbles[ball.getRow()][ball.getCol()-1]);
     	}
     	
@@ -259,7 +310,7 @@ public class BubbleShooter extends JFrame {
             		sosedi.add(bubbles[ball.getRow()+1][ball.getCol()+1]);
         		}
     		}
-    		if (ball.getRow()-1 > 0) {
+    		if (ball.getRow()-1 >= 0) {
         		sosedi.add(bubbles[ball.getRow()-1][ball.getCol()]);
         		if (ball.getCol()+1 < BOARD_COLUMNS) {
             		sosedi.add(bubbles[ball.getRow()-1][ball.getCol()+1]);
@@ -268,28 +319,25 @@ public class BubbleShooter extends JFrame {
     	}
     	if (ball.getRow()%2 == 0) {
     		if (ball.getRow()+1 < BOARD_ROWS) {
-        		sosedi.add(bubbles[ball.getRow()-1][ball.getCol()]);
-        		if (ball.getCol()-1 > 0) {
+        		sosedi.add(bubbles[ball.getRow()+1][ball.getCol()]);
+        		if (ball.getCol()-1 >= 0) {
             		sosedi.add(bubbles[ball.getRow()+1][ball.getCol()-1]);
         		}
     		}
-    		if (ball.getRow()-1 > 0) {
+    		if (ball.getRow()-1 >= 0) {
         		sosedi.add(bubbles[ball.getRow()-1][ball.getCol()]);
-        		if (ball.getCol()-1 > 0) {
+        		if (ball.getCol()-1 >= 0) {
             		sosedi.add(bubbles[ball.getRow()-1][ball.getCol()-1]);
         		}
     		}
     	}
-    	
-    	
+    	Set<Bubble> pravi_sosedi = new HashSet<Bubble>();
     	for (Bubble sosed:sosedi) {
-    		if (sosed.getColor() == ball.getColor() && !set.contains(sosed)) {
-        		set.add(sosed);
-        		set.addAll(izbrise(bubbles, sosed, set));
-        	}
+    		if (!sosed.isEmpty()) {
+    			pravi_sosedi.add(sosed);
+    		}
     	}
-    	
-		return set;
+    	return pravi_sosedi;
     }
 
  class GameBoard {
