@@ -1,17 +1,20 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.HashSet;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
 
 
 public class BubbleShooter extends JFrame {
@@ -49,6 +52,9 @@ public class BubbleShooter extends JFrame {
     
     private Color ballColor;
     
+    boolean konec = false;
+
+    
     public BubbleShooter() {
         super();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,7 +63,10 @@ public class BubbleShooter extends JFrame {
         setResizable(false);
         setLayout(new BorderLayout());
         
+        
+        
         JPanel panel = new JPanel() {
+        	
         	
     	    
             @Override
@@ -87,8 +96,17 @@ public class BubbleShooter extends JFrame {
                 
                 g.setColor(Color.BLACK);
                 g.drawString("Score: " + score, getWidth() - 80, getHeight() - 20);
+                
+                if (konec){
+                	g.setColor(Color.BLACK);
+                    int x2 = (PANEL_WIDTH / 2 - 70); 
+                    int y2 = (PANEL_HEIGHT / 2);
+                    Font font = new Font("Arial", Font.BOLD, 20); 
+                    g.setFont(font);
+                    g.drawString("GAME OVER! :(", x2, y2);
+                }
 
-
+                
             }
         };
         panel.addMouseListener(new MouseAdapter() {
@@ -123,7 +141,8 @@ public class BubbleShooter extends JFrame {
         Random random = new Random();
         ballColor = bubbleColors[random.nextInt(bubbleColors.length)];
         
-        while (true) {
+        
+        while (!konec) {
         	nic = "0";   //ne sprašuj, ce tle nc ni se nc ne nardi ob kliku, nima smisla ampak dela
         	if (direction != null) {
         		
@@ -165,11 +184,18 @@ public class BubbleShooter extends JFrame {
         					}
         					score += isti_sosedi.size() * 10;
         				}
-
+         				if (ball.getY() >= START_Y - BUBBLE_SIZE){
+        						konec = true;
+        						panel.repaint();
+        				}
+        					
+        				
         				direction = null;
         				ball.setLocation(START_X, START_Y);
         				ballColor = bubbleColors[random.nextInt(bubbleColors.length)];
         				panel.repaint();
+        				
+        				
         				
         				break;
         			}
