@@ -3,8 +3,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import java.util.Random;
 import java.util.Set;
 import java.util.HashSet;
@@ -22,9 +24,10 @@ public class BubbleShooter extends JFrame {
             //bubbleShooter.setVisible(true);
       
     }
-    static int PANEL_HEIGHT = 610;
-    static int PANEL_WIDTH = 305;
-    static int BUBBLE_SIZE = 23;
+    static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    static int PANEL_HEIGHT = (int)(0.8*screenSize.getHeight());
+    static int PANEL_WIDTH = PANEL_HEIGHT/2;
+    static int BUBBLE_SIZE = PANEL_WIDTH/13;
     static int BOARD_ROWS = 24;
     static int BOARD_COLUMNS = 12;
     static Color[] bubbleColors = { new Color(80, 171, 199), new Color(245, 66, 102),
@@ -32,12 +35,13 @@ public class BubbleShooter extends JFrame {
     
     GameBoard gameBoard = new GameBoard();
     
+    
     static int START_X = PANEL_WIDTH/2 - BUBBLE_SIZE/2;
-    static int START_Y = PANEL_HEIGHT - 50 - BUBBLE_SIZE;
+    static int START_Y = PANEL_HEIGHT - 3*BUBBLE_SIZE;
     
     private Point ball = new Point(START_X, START_Y);
     
-    private Point direction;
+    private Point2D.Double direction;
     
     private int score = 0;
     
@@ -52,7 +56,7 @@ public class BubbleShooter extends JFrame {
         setSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         setResizable(false);
         setLayout(new BorderLayout());
-
+        
         JPanel panel = new JPanel() {
         	
     	    
@@ -71,13 +75,13 @@ public class BubbleShooter extends JFrame {
                         }
                         
                         g.setColor(bubble.getColor());
-                        g.fillOval(bubble.getX(), bubble.getY(), BUBBLE_SIZE, BUBBLE_SIZE);
+                        g.fillOval((int)(bubble.getX()), (int)(bubble.getY()), BUBBLE_SIZE, BUBBLE_SIZE);
 
                     }
                 }
                 g.setColor(ballColor);                	
-                int x = (int) (ball.getX());
-                int y = (int) (ball.getY());
+                int x = (int) Math.round(ball.getX());
+                int y = (int) Math.round(ball.getY());
                 g.fillOval(x, y, BUBBLE_SIZE, BUBBLE_SIZE);
                 
                 
@@ -97,7 +101,7 @@ public class BubbleShooter extends JFrame {
                     double speed = 10;
                     double directionX = speed * dx / distance;
                     double directionY = speed * dy / distance;
-                    direction = new Point((int)Math.round(directionX), (int)Math.round(directionY));
+                    direction = new Point2D.Double(directionX, directionY);
                     //double klikX = e.getX();
                     //double klikY = e.getY();
                     //double angle = Math.atan2(klikY - (ball.getY()+0.5*BUBBLE_SIZE), klikX - (ball.getX()+0.5*BUBBLE_SIZE));
@@ -175,15 +179,15 @@ public class BubbleShooter extends JFrame {
         			if (ball.getX() <= 0) {
         				ball.setLocation(0, ball.getY());
         				direction.setLocation(-direction.getX(), direction.getY());
-        			} else if (ball.getX() >= panel.getWidth() - 23) {
-        				ball.setLocation(panel.getWidth() - 23, ball.getY());
+        			} else if (ball.getX() >= panel.getWidth() - BUBBLE_SIZE) {
+        				ball.setLocation(panel.getWidth() - BUBBLE_SIZE, ball.getY());
         				direction.setLocation(-direction.getX(), direction.getY());
         			}
-        			if (ball.getY() <= 23) {
-        				ball.setLocation(ball.getX(), 23);
+        			if (ball.getY() <= BUBBLE_SIZE) {
+        				ball.setLocation(ball.getX(), BUBBLE_SIZE);
         				direction.setLocation(direction.getX(), -direction.getY());
-        			} else if (ball.getY() >= panel.getHeight() - 23) {
-        				ball.setLocation(ball.getX(), panel.getHeight() - 23);
+        			} else if (ball.getY() >= panel.getHeight() - BUBBLE_SIZE) {
+        				ball.setLocation(ball.getX(), panel.getHeight() - BUBBLE_SIZE);
         				direction.setLocation(direction.getX(), -direction.getY());
         			}
         			panel.repaint();
@@ -296,8 +300,8 @@ public class BubbleShooter extends JFrame {
         private int col;
         private Color color;
         private boolean empty;
-        private int x;
-        private int y;
+        private double x;
+        private double y;
 
         public Bubble(int row, int col, Color color) {
             this.row = row;
@@ -306,7 +310,7 @@ public class BubbleShooter extends JFrame {
             x = col * BUBBLE_SIZE;
             y = row * BUBBLE_SIZE;
             if (row % 2 == 1) 	
-            	x = x + (int)(0.5* BUBBLE_SIZE);
+            	x = x + 0.5* BUBBLE_SIZE;
         }
         
         public Bubble(int row, int col, boolean empty) {
@@ -327,10 +331,10 @@ public class BubbleShooter extends JFrame {
         public void setCol(int col) {
         	this.col = col ;
         }
-        public int getX() {
+        public double getX() {
         	return x;
         }
-        public int getY() {
+        public double getY() {
         	return y;
         }
         public Color getColor() {
