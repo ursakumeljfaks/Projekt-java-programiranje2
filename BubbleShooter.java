@@ -63,6 +63,8 @@ public class BubbleShooter extends JFrame {
     
     private JLabel scoreLabel; 
     
+    private int steviloStrelov = 0;
+    
 
     
     public BubbleShooter() {
@@ -156,7 +158,7 @@ public class BubbleShooter extends JFrame {
         
         PANEL_HEIGHT = panel.getHeight();
         PANEL_WIDTH = panel.getWidth();
-        BUBBLE_SIZE = (int)Math.round(PANEL_WIDTH/12.5);
+        BUBBLE_SIZE = (int)(PANEL_WIDTH/12.5);
         START_X = PANEL_WIDTH/2 - BUBBLE_SIZE/2;
         START_Y = PANEL_HEIGHT - 3*BUBBLE_SIZE;
         ball = new Point(START_X, START_Y);
@@ -228,12 +230,36 @@ public class BubbleShooter extends JFrame {
         						panel.repaint();
         						
         				}
-        					
+        				
+         				steviloStrelov += 1;
         				
         				direction = null;
         				ball.setLocation(START_X, START_Y);
         				ballColor = bubbleColors[random.nextInt(bubbleColors.length)];
+        				
+        				if (steviloStrelov % 5 == 0) {
+        					Bubble[][] newBubbles = new Bubble[bubbles.length + 1][bubbles[0].length];
+
+        				    
+        				    for (int row1 = 0; row1 < bubbles.length; row1++) {
+        				        for (int col1 = 0; col1 < bubbles[row1].length; col1++) {
+        				            newBubbles[row1 + 1][col1] = bubbles[row1][col1];
+        				        }
+        				    }
+        					
+        				    for (int col2 = 0; col2 < newBubbles[0].length; col2++) {
+        				        Color randomColor = bubbleColors[random.nextInt(bubbleColors.length)];
+        				        Bubble bubble = new Bubble(0, col2, randomColor);
+        				        newBubbles[0][col2] = bubble;
+        				    }
+
+        				    
+        				    bubbles = newBubbles;
+
+        					       				   
+        				}
         				panel.repaint();
+        				
         				
         				 
         				
