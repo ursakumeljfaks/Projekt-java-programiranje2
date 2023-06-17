@@ -184,12 +184,12 @@ public class BubbleShooter extends JFrame {
         				}
 
         				int col = (int) (ball.getX() / BUBBLE_SIZE);
-        				if (row % 2 == 1) {
+        				if (bubbles[row][0].isIndent()) {
         					if (Math.abs((col+0.5)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1.5)*BUBBLE_SIZE - ball.getX()))){
         						col += 1;
         					}
         				}
-        				if (row % 2 == 0) {
+        				if (!bubbles[row][0].isIndent()) {
         					if (Math.abs((col)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1)*BUBBLE_SIZE - ball.getX()))){
         						col += 1;
         					}
@@ -211,62 +211,68 @@ public class BubbleShooter extends JFrame {
         					}
         					score += isti_sosedi.size() * 10;
         					scoreLabel.setText("Score: " + score);
-        				
-        				
-                		for (int i = 0; i < bubbles.length; i++) {
-                            for (int j = 0; j < bubbles[j].length; j++) {
-                                Bubble bubble = bubbles[i][j];
-                                if (!bubble.isEmpty()) {
-                                	Set<Bubble> pregledani = new HashSet<Bubble>();
-                                	for (Bubble ball: lebdi(bubbles, bubble, pregledani)) {
-                                		ball.setEmpty();
-                                	}
-                                }
-                            }
-        				}}
-        				
-         				if (ball.getY() >= START_Y - BUBBLE_SIZE){
-        						konec = true;
-        						panel.repaint();
-        						
+
+
+        					for (int i = 0; i < bubbles.length; i++) {
+        						for (int j = 0; j < bubbles[j].length; j++) {
+        							Bubble bubble = bubbles[i][j];
+        							if (!bubble.isEmpty()) {
+        								Set<Bubble> pregledani = new HashSet<Bubble>();
+        								for (Bubble ball: lebdi(bubbles, bubble, pregledani)) {
+        									ball.setEmpty();
+        								}
+        							}
+        						}
+        					}}
+
+        				if (jeKonec(bubbles)) {
+        					konec = true;
+        					panel.repaint();
+        					break;
         				}
-        				
-         				steviloStrelov += 1;
-        				
+
+        				steviloStrelov += 1;
+
         				direction = null;
         				ball.setLocation(START_X, START_Y);
         				ballColor = bubbleColors[random.nextInt(bubbleColors.length)];
-        				
+
         				if (steviloStrelov % 5 == 0) {
-        					Bubble[][] newBubbles = new Bubble[bubbles.length + 1][bubbles[0].length];
 
-        				    
-        				    for (int row1 = 0; row1 < bubbles.length; row1++) {
-        				        for (int col1 = 0; col1 < bubbles[row1].length; col1++) {
-        				            newBubbles[row1 + 1][col1] = bubbles[row1][col1];
-        				        }
-        				    }
-        					
-        				    for (int col2 = 0; col2 < newBubbles[0].length; col2++) {
-        				        Color randomColor = bubbleColors[random.nextInt(bubbleColors.length)];
-        				        Bubble bubble = new Bubble(0, col2, randomColor);
-        				        newBubbles[0][col2] = bubble;
-        				    }
+        					for (int row1 = bubbles.length-2; row1 >= 0; row1--) {
+        						for (int col1 = 0; col1 < bubbles[row1].length; col1++) {
+        							Bubble trenutni = bubbles[row1][col1];
+        							trenutni.setCol(col1);
+        							trenutni.setRow(row1+1);
+        							bubbles[row1+1][col1] = trenutni; 
+        						}
+        					}
+        					boolean indent = bubbles[1][0].isIndent();
+        					for (int col2 = 0; col2 < bubbles[0].length; col2++) {
+        						Color randomColor = bubbleColors[random.nextInt(bubbleColors.length)];
+        						Bubble nov_bubble = new Bubble(0, col2, randomColor, !indent);
+        						bubbles[0][col2] = nov_bubble;
+        					}
 
-        				    
-        				    bubbles = newBubbles;
+        					if (jeKonec(bubbles)) {
+        						konec = true;
+        						panel.repaint();
+        						break;
+        					}
 
-        					       				   
+
+
+
         				}
         				panel.repaint();
-        				
-        				
-        				 
-        				
+
+
+
+
         				break;
         			}
 
-        			
+
 
         			if (ball.getX() <= 0) {
         				ball.setLocation(0, ball.getY());
@@ -294,6 +300,15 @@ public class BubbleShooter extends JFrame {
         	}
         }
     }
+    public boolean jeKonec(Bubble[][] bubbles) {
+    	for (Bubble ball:bubbles[bubbles.length-1]) {
+    		if (!ball.isEmpty()) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
     public boolean dotakne(Bubble[][] bubbles, Point ball) {
     	for (int i = 0; i < bubbles.length; i++) {
 			for (int j = 0; j < bubbles[i].length; j++) {
@@ -358,7 +373,7 @@ public class BubbleShooter extends JFrame {
     		sosedi.add(bubbles[ball.getRow()][ball.getCol()-1]);
     	}
     	
-    	if (ball.getRow()%2 == 1) {
+    	if (ball.isIndent()) {
     		if (ball.getRow()+1 < BOARD_ROWS) {
         		sosedi.add(bubbles[ball.getRow()+1][ball.getCol()]);
         		if (ball.getCol()+1 < BOARD_COLUMNS) {
@@ -372,7 +387,7 @@ public class BubbleShooter extends JFrame {
         		}
     		}
     	}
-    	if (ball.getRow()%2 == 0) {
+    	if (!ball.isIndent()) {
     		if (ball.getRow()+1 < BOARD_ROWS) {
         		sosedi.add(bubbles[ball.getRow()+1][ball.getCol()]);
         		if (ball.getCol()-1 >= 0) {
@@ -405,14 +420,16 @@ public class BubbleShooter extends JFrame {
 
             for (int row = 0; row < bubbles.length/3; row++) {
                 for (int col = 0; col < bubbles[row].length; col++) {
-                    Color randomColor = bubbleColors[random.nextInt(bubbleColors.length)];                    
-                    Bubble bubble = new Bubble(row, col, randomColor);
+                    Color randomColor = bubbleColors[random.nextInt(bubbleColors.length)];
+                    boolean indent = row%2==1? true:false;
+                    Bubble bubble = new Bubble(row, col, randomColor, indent);
                     bubbles[row][col] = bubble;
                 }
             }
             for (int row = bubbles.length/3; row < bubbles.length; row++) {
                 for (int col = 0; col < bubbles[row].length; col++) {
-                	Bubble bubble = new Bubble(row, col, true);
+                	boolean indent = row%2==1? true:false;
+                	Bubble bubble = new Bubble(row, col, true,indent);
                     bubbles[row][col] = bubble;
                 }
             }
@@ -432,19 +449,21 @@ public class BubbleShooter extends JFrame {
         private boolean empty;
         private double x;
         private double y;
+        private boolean indent;
 
-        public Bubble(int row, int col, Color color) {
+        public Bubble(int row, int col, Color color, boolean indent) {
             this.row = row;
             this.col = col;
             this.color = color;
+            this.indent = indent;
             x = col * BUBBLE_SIZE;
             y = row * BUBBLE_SIZE;
-            if (row % 2 == 1) 	
+            if (indent) 	
             	x = x + 0.5* BUBBLE_SIZE;
         }
         
-        public Bubble(int row, int col, boolean empty) {
-        	this(row, col, Color.WHITE);
+        public Bubble(int row, int col, boolean empty, boolean indent) {
+        	this(row, col, Color.WHITE, indent);
         	this.empty = empty;        	
         }
 
@@ -453,13 +472,21 @@ public class BubbleShooter extends JFrame {
         }
         public void setRow(int row) {
         	this.row = row;
+        	x = col * BUBBLE_SIZE;
+            y = row * BUBBLE_SIZE;
+            if (indent) 	
+            	x = x + 0.5* BUBBLE_SIZE;
         }
 
         public int getCol() {
             return col;
         }
         public void setCol(int col) {
-        	this.col = col ;
+        	this.col = col;
+        	x = col * BUBBLE_SIZE;
+            y = row * BUBBLE_SIZE;
+            if (indent) 	
+            	x = x + 0.5* BUBBLE_SIZE;
         }
         public double getX() {
         	return x;
@@ -484,6 +511,12 @@ public class BubbleShooter extends JFrame {
         }
         public void setEmpty(boolean vr) {
         	empty = vr;
+        }
+        public boolean isIndent() {
+        	return indent;
+        }
+        public void setIndent(boolean vr) {
+        	indent = vr;
         }
     }
 } 
