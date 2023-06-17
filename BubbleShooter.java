@@ -33,21 +33,23 @@ public class BubbleShooter extends JFrame {
       
     }
     static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    static int PANEL_HEIGHT = (int)(0.8*screenSize.getHeight());
-    static int PANEL_WIDTH = PANEL_HEIGHT/2;
-    static int BUBBLE_SIZE = PANEL_WIDTH/13;
+    static int FRAME_HEIGHT = (int)(0.8*screenSize.getHeight());
+    static int FRAME_WIDTH = FRAME_HEIGHT/2;
+    static int PANEL_HEIGHT;
+    static int PANEL_WIDTH;
+    static int BUBBLE_SIZE;// = PANEL_WIDTH/13;
     static int BOARD_ROWS = 24;
     static int BOARD_COLUMNS = 12;
     static Color[] bubbleColors = { new Color(80, 171, 199), new Color(245, 66, 102),
     		new Color(91, 176, 72), new Color(230, 230, 76), new Color(165, 22, 222)};
     
-    GameBoard gameBoard = new GameBoard();
+    GameBoard gameBoard;// = new GameBoard();
     
     
-    static int START_X = PANEL_WIDTH/2 - BUBBLE_SIZE/2;
-    static int START_Y = PANEL_HEIGHT - 3*BUBBLE_SIZE;
+    static int START_X;// = PANEL_WIDTH/2 - BUBBLE_SIZE/2;
+    static int START_Y;// = PANEL_HEIGHT - 3*BUBBLE_SIZE;
     
-    private Point ball = new Point(START_X, START_Y);
+    private Point ball;// = new Point(START_X, START_Y);
     
     private Point2D.Double direction;
     
@@ -68,19 +70,14 @@ public class BubbleShooter extends JFrame {
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getRootPane().putClientProperty("apple.awt.brushMetalLook", true);
-        //pack();
-        //setSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+        setSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
         setResizable(false);
         setLayout(new BorderLayout());
         
         
         JPanel panel = new JPanel() {
         	
-        	
-        	@Override
-            public Dimension getPreferredSize() {
-                return new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
-            }
+
         
     	    
             @Override
@@ -150,15 +147,20 @@ public class BubbleShooter extends JFrame {
         
         JFrame frame = new JFrame("Bubble Shooter");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(PANEL_WIDTH, PANEL_HEIGHT);
-        frame.getContentPane().add(panel);
-        frame.setLocationRelativeTo(null);
+        frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
         frame.add(panel, BorderLayout.CENTER);
-        frame.pack();
         frame.setVisible(true);
         frame.add(scorePanel, BorderLayout.SOUTH);
+        
+        PANEL_HEIGHT = panel.getHeight();
+        PANEL_WIDTH = panel.getWidth();
+        BUBBLE_SIZE = (int)Math.round(PANEL_WIDTH/12.5);
+        START_X = PANEL_WIDTH/2 - BUBBLE_SIZE/2;
+        START_Y = PANEL_HEIGHT - 3*BUBBLE_SIZE;
+        ball = new Point(START_X, START_Y);
+        gameBoard = new GameBoard();
         
         
         Random random = new Random();
@@ -243,15 +245,15 @@ public class BubbleShooter extends JFrame {
         			if (ball.getX() <= 0) {
         				ball.setLocation(0, ball.getY());
         				direction.setLocation(-direction.getX(), direction.getY());
-        			} else if (ball.getX() >= panel.getWidth() - BUBBLE_SIZE) {
-        				ball.setLocation(panel.getWidth() - BUBBLE_SIZE, ball.getY());
+        			} else if (ball.getX() >= PANEL_WIDTH - BUBBLE_SIZE) {
+        				ball.setLocation(PANEL_WIDTH - BUBBLE_SIZE, ball.getY());
         				direction.setLocation(-direction.getX(), direction.getY());
         			}
         			if (ball.getY() <= BUBBLE_SIZE) {
         				ball.setLocation(ball.getX(), BUBBLE_SIZE);
         				direction.setLocation(direction.getX(), -direction.getY());
-        			} else if (ball.getY() >= panel.getHeight() - BUBBLE_SIZE) {
-        				ball.setLocation(ball.getX(), panel.getHeight() - BUBBLE_SIZE);
+        			} else if (ball.getY() >= PANEL_HEIGHT - BUBBLE_SIZE) {
+        				ball.setLocation(ball.getX(), PANEL_HEIGHT - BUBBLE_SIZE);
         				direction.setLocation(direction.getX(), -direction.getY());
         			}
         			panel.repaint();
