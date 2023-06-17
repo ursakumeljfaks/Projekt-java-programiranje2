@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -13,6 +14,7 @@ import java.util.Random;
 import java.util.Set;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
@@ -24,7 +26,10 @@ public class BubbleShooter extends JFrame {
     public static void main(String[] args) {
     	
             BubbleShooter bubbleShooter = new BubbleShooter();
+            
             //bubbleShooter.setVisible(true);
+            
+            
       
     }
     static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -53,21 +58,30 @@ public class BubbleShooter extends JFrame {
     private Color ballColor;
     
     boolean konec = false;
+    
+    private JLabel scoreLabel; 
+    
 
     
     public BubbleShooter() {
         super();
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getRootPane().putClientProperty("apple.awt.brushMetalLook", true);
-        setSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+        //pack();
+        //setSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         setResizable(false);
         setLayout(new BorderLayout());
-        
         
         
         JPanel panel = new JPanel() {
         	
         	
+        	@Override
+            public Dimension getPreferredSize() {
+                return new Dimension(PANEL_WIDTH, PANEL_HEIGHT);
+            }
+        
     	    
             @Override
             public void paintComponent(Graphics g) {
@@ -94,8 +108,8 @@ public class BubbleShooter extends JFrame {
                 g.fillOval(x, y, BUBBLE_SIZE, BUBBLE_SIZE);
                 
                 
-                g.setColor(Color.BLACK);
-                g.drawString("Score: " + score, getWidth() - 80, getHeight() - 20);
+                //g.setColor(Color.BLACK);
+                //g.drawString("Score: " + score, getWidth() - 80, getHeight() - 20);
                 
                 if (konec){
                 	g.setColor(Color.BLACK);
@@ -103,47 +117,56 @@ public class BubbleShooter extends JFrame {
                     int y2 = (PANEL_HEIGHT / 2);
                     Font font = new Font("Arial", Font.BOLD, 20); 
                     g.setFont(font);
-                    g.drawString("GAME OVER! :(", x2, y2);
+                    g.drawString("GAME OVER!", x2, y2);
                 }
 
-                
+              
             }
+            
         };
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (ball.getX()==START_X && ball.getY() == START_Y) {
+                if (ball.getX() == START_X && ball.getY() == START_Y) {
                     double dx = e.getX() - ball.getX();
                     double dy = e.getY() - ball.getY();
                     double distance = Math.sqrt(dx * dx + dy * dy);
                     double speed = 10;
                     double directionX = speed * dx / distance;
                     double directionY = speed * dy / distance;
-                    direction = new Point2D.Double(directionX, directionY);
-                    //double klikX = e.getX();
-                    //double klikY = e.getY();
-                    //double angle = Math.atan2(klikY - (ball.getY()+0.5*BUBBLE_SIZE), klikX - (ball.getX()+0.5*BUBBLE_SIZE));
-                    //double speed = 5;
-                    //direction = new Point((int) Math.round(speed * Math.cos(angle)), (int) Math.round(speed * Math.sin(angle)));
+                    direction = new Point2D.Double(directionX, directionY);                    //direction = new Point((int) Math.round(speed * Math.cos(angle)), (int) Math.round(speed * Math.sin(angle)));
                 }
             }
         });
- 
+        
+        JPanel scorePanel = new JPanel();
+        scoreLabel = new JLabel("Score: " + score);
+        scorePanel.setPreferredSize(new Dimension(PANEL_WIDTH, 40));
+        scorePanel.setBackground(new Color(201, 199, 191));
+        scorePanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        scoreLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        scorePanel.add(scoreLabel);
+        
+        
         JFrame frame = new JFrame("Bubble Shooter");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(PANEL_WIDTH, PANEL_HEIGHT);
+        frame.getContentPane().add(panel);
+        frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
         frame.add(panel, BorderLayout.CENTER);
+        frame.pack();
         frame.setVisible(true);
+        frame.add(scorePanel, BorderLayout.SOUTH);
         
-       
+        
         Random random = new Random();
         ballColor = bubbleColors[random.nextInt(bubbleColors.length)];
         
         
         while (!konec) {
-        	nic = "0";   //ne sprašuj, ce tle nc ni se nc ne nardi ob kliku, nima smisla ampak dela
+        	nic = "0";   
         	if (direction != null) {
         		
         		while (true) {
@@ -183,6 +206,7 @@ public class BubbleShooter extends JFrame {
         						sosed.setEmpty();
         					}
         					score += isti_sosedi.size() * 10;
+        					scoreLabel.setText("Score: " + score);
         				
         				
                 		for (int i = 0; i < bubbles.length; i++) {
@@ -200,6 +224,7 @@ public class BubbleShooter extends JFrame {
          				if (ball.getY() >= START_Y - BUBBLE_SIZE){
         						konec = true;
         						panel.repaint();
+        						
         				}
         					
         				
@@ -208,7 +233,7 @@ public class BubbleShooter extends JFrame {
         				ballColor = bubbleColors[random.nextInt(bubbleColors.length)];
         				panel.repaint();
         				
-        				
+        				 
         				
         				break;
         			}
@@ -294,6 +319,8 @@ public class BubbleShooter extends JFrame {
         
         return vsi;
     }
+    
+    
     public Set<Bubble> vsi_sosedi(Bubble[][] bubbles, Bubble ball){
     	Set<Bubble> sosedi = new HashSet<Bubble>();
     	if (ball.getCol()+1 < BOARD_COLUMNS) {
@@ -368,6 +395,7 @@ public class BubbleShooter extends JFrame {
             return bubbles;
         }
     }
+ 
 
     public class Bubble {
         private int row;
