@@ -38,7 +38,7 @@ public class BubbleShooter extends JFrame {
     static int PANEL_HEIGHT;
     static int PANEL_WIDTH;
     static int BUBBLE_SIZE;// = PANEL_WIDTH/13;
-    static int BOARD_ROWS = 24;
+    static int BOARD_ROWS = 23;
     static int BOARD_COLUMNS = 12;
     static Color[] bubbleColors = { new Color(80, 171, 199), new Color(245, 66, 102),
     		new Color(91, 176, 72), new Color(230, 230, 76), new Color(165, 22, 222)};
@@ -195,18 +195,18 @@ public class BubbleShooter extends JFrame {
         			ball.setLocation(ball.getX() + direction.getX(), ball.getY() + direction.getY());
         			if (dotakne(bubbles, ball)) {                	
         				int row = (int) (ball.getY() / BUBBLE_SIZE);
-        				if ((ball.getY()/BUBBLE_SIZE)%1 > 0.5) {
+        				if ((ball.getY()/BUBBLE_SIZE)%1 > 0.5 && row+1 < bubbles.length) {
         					row += 1;
         				}
 
         				int col = (int) (ball.getX() / BUBBLE_SIZE);
         				if (bubbles[row][0].isIndent()) {
-        					if (Math.abs((col+0.5)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1.5)*BUBBLE_SIZE - ball.getX()))){
+        					if (Math.abs((col+0.5)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1.5)*BUBBLE_SIZE - ball.getX()))&& col+1<bubbles[row].length){
         						col += 1;
         					}
         				}
         				if (!bubbles[row][0].isIndent()) {
-        					if (Math.abs((col)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1)*BUBBLE_SIZE - ball.getX()))){
+        					if (Math.abs((col)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1)*BUBBLE_SIZE - ball.getX()))&& col+1<bubbles[row].length){
         						col += 1;
         					}
         				}
