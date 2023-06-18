@@ -16,7 +16,6 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.Timer;
 
 
 
@@ -163,8 +162,10 @@ public class BubbleShooter extends JFrame {
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
         frame.add(panel, BorderLayout.CENTER);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         frame.add(scorePanel, BorderLayout.SOUTH);
+        
         
         PANEL_HEIGHT = panel.getHeight();
         PANEL_WIDTH = panel.getWidth();
