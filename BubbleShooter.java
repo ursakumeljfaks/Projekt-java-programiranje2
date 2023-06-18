@@ -45,7 +45,8 @@ public class BubbleShooter extends JFrame {
     
     GameBoard gameBoard;// = new GameBoard();
     
-    int a = 0;
+    int a = 0; 
+    int b = 225;
     
     
     static int START_X;// = PANEL_WIDTH/2 - BUBBLE_SIZE/2;
@@ -79,10 +80,7 @@ public class BubbleShooter extends JFrame {
         setLayout(new BorderLayout());
         
         
-        JPanel panel = new JPanel() {
-        	
-
-        
+        JPanel panel = new JPanel() {       	
     	    
             @Override
             public void paintComponent(Graphics g) {
@@ -114,21 +112,27 @@ public class BubbleShooter extends JFrame {
                 	g.setColor(Color.BLACK);
                     int x2 = (PANEL_WIDTH / 2 - 70); 
                     int y2 = (PANEL_HEIGHT / 2);
+                    
                     Font font = new Font("Arial", Font.BOLD, 30); 
                     g.setFont(font);                 
                     g.drawString("GAME OVER!", a, y2);
-                    
+                    g.drawString("Score: " + score, b, y2 + 50);
                     try {
                     	Thread.sleep(20);
                     	
                     	if (a < x2 - 25) {
                     		a += 1;
                     	}
+                    	if (b > x2 + 10) {
+                    		b -= 1.5;
+                    	}
+                    	
                     repaint();
                     }catch (Exception e) {
                     	
                     }
                 }
+                
             }
             
         };
@@ -268,7 +272,6 @@ public class BubbleShooter extends JFrame {
 
         					if (jeKonec(bubbles)) {
         						konec = true;
-        						
         						panel.repaint();
         						
         						break;
