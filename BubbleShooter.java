@@ -16,6 +16,7 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 
 
@@ -44,6 +45,8 @@ public class BubbleShooter extends JFrame {
     		new Color(91, 176, 72), new Color(230, 230, 76), new Color(165, 22, 222)};
     
     GameBoard gameBoard;// = new GameBoard();
+    
+    int a = 0;
     
     
     static int START_X;// = PANEL_WIDTH/2 - BUBBLE_SIZE/2;
@@ -106,20 +109,27 @@ public class BubbleShooter extends JFrame {
                 int y = (int) Math.round(ball.getY());
                 g.fillOval(x, y, BUBBLE_SIZE, BUBBLE_SIZE);
                 
-                
-                //g.setColor(Color.BLACK);
-                //g.drawString("Score: " + score, getWidth() - 80, getHeight() - 20);
+       
                 
                 if (konec){
                 	g.setColor(Color.BLACK);
                     int x2 = (PANEL_WIDTH / 2 - 70); 
                     int y2 = (PANEL_HEIGHT / 2);
-                    Font font = new Font("Arial", Font.BOLD, 20); 
-                    g.setFont(font);
-                    g.drawString("GAME OVER!", x2, y2);
+                    Font font = new Font("Arial", Font.BOLD, 30); 
+                    g.setFont(font);                 
+                    g.drawString("GAME OVER!", a, y2);
+                    
+                    try {
+                    	Thread.sleep(20);
+                    	
+                    	if (a < x2 - 25) {
+                    		a += 1;
+                    	}
+                    repaint();
+                    }catch (Exception e) {
+                    	
+                    }
                 }
-
-              
             }
             
         };
@@ -170,7 +180,8 @@ public class BubbleShooter extends JFrame {
         
         
         while (!konec) {
-        	nic = "0";   
+        	nic = "0";  
+        	
         	if (direction != null) {
         		
         		while (true) {
@@ -179,18 +190,18 @@ public class BubbleShooter extends JFrame {
         			ball.setLocation(ball.getX() + direction.getX(), ball.getY() + direction.getY());
         			if (dotakne(bubbles, ball)) {                	
         				int row = (int) (ball.getY() / BUBBLE_SIZE);
-        				if ((ball.getY()/BUBBLE_SIZE)%1 > 0.5 && row+1 < bubbles.length) {
+        				if ((ball.getY()/BUBBLE_SIZE)%1 > 0.5) {
         					row += 1;
         				}
 
         				int col = (int) (ball.getX() / BUBBLE_SIZE);
         				if (bubbles[row][0].isIndent()) {
-        					if (Math.abs((col+0.5)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1.5)*BUBBLE_SIZE - ball.getX())) && col+1<bubbles[row].length){
+        					if (Math.abs((col+0.5)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1.5)*BUBBLE_SIZE - ball.getX()))){
         						col += 1;
         					}
         				}
         				if (!bubbles[row][0].isIndent()) {
-        					if (Math.abs((col)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1)*BUBBLE_SIZE - ball.getX()))&& col+1<bubbles[row].length){
+        					if (Math.abs((col)*BUBBLE_SIZE - ball.getX()) > (Math.abs((col+1)*BUBBLE_SIZE - ball.getX()))){
         						col += 1;
         					}
         				}
@@ -256,10 +267,11 @@ public class BubbleShooter extends JFrame {
 
         					if (jeKonec(bubbles)) {
         						konec = true;
+        						
         						panel.repaint();
+        						
         						break;
         					}
-
 
 
 
@@ -300,6 +312,7 @@ public class BubbleShooter extends JFrame {
         	}
         }
     }
+    
     public boolean jeKonec(Bubble[][] bubbles) {
     	for (Bubble ball:bubbles[bubbles.length-1]) {
     		if (!ball.isEmpty()) {
